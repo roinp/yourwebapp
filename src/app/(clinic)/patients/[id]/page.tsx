@@ -91,7 +91,7 @@ export default function PatientProfilePage() {
       <section className="card p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-100 text-xl font-semibold text-teal-700">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-teal-100 text-xl font-semibold text-teal-700">
               {patient.first_name[0]}
               {patient.last_name[0]}
             </div>

@@ -259,7 +259,7 @@ export default function AppointmentForm({
             ))}
           </select>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="sm:col-span-3">
             <label className="label">ექიმი</label>
             <select className="input" value={form.doctor_id} onChange={set("doctor_id")}>

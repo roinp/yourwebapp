@@ -69,7 +69,7 @@ export default function TreatmentForm({
     <Modal title={treatment ? "მკურნალობის რედაქტირება" : "მკურნალობის დამატება"} onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <DraftNotice restored={draft.restored} onReset={draft.reset} />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="label">თარიღი *</label>
             <input type="date" required className="input" value={form.date} onChange={set("date")} />

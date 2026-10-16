@@ -7,20 +7,22 @@ import type { Expense } from "@/lib/types";
 import ExpenseForm, { EXPENSE_CATEGORIES } from "@/components/ExpenseForm";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import Pagination, { paginate } from "@/components/Pagination";
-import PasswordGate from "@/components/PasswordGate";
+// import PasswordGate from "@/components/PasswordGate";
 
 const totalOf = (e: Expense) => Number(e.unit_price) * Number(e.quantity);
 const remainingOf = (e: Expense) => totalOf(e) - Number(e.paid);
 
-// SHA-256 of the expenses password (the password itself is not stored in code).
-const EXPENSES_PASSWORD_HASH = "3230c6c3d1e07097503bd32c96aa71d879831ab6a13f1e322383a76b4ab02911";
+// Demo version: the expenses page opens without a password.
+// // SHA-256 of the expenses password (the password itself is not stored in code).
+// const EXPENSES_PASSWORD_HASH = "3230c6c3d1e07097503bd32c96aa71d879831ab6a13f1e322383a76b4ab02911";
 
 export default function ExpensesPage() {
-  return (
-    <PasswordGate title="ხარჯები" passwordHash={EXPENSES_PASSWORD_HASH}>
-      <Expenses />
-    </PasswordGate>
-  );
+  return <Expenses />;
+  // return (
+  //   <PasswordGate title="ხარჯები" passwordHash={EXPENSES_PASSWORD_HASH}>
+  //     <Expenses />
+  //   </PasswordGate>
+  // );
 }
 
 function Expenses() {
@@ -76,7 +78,7 @@ function Expenses() {
         </button>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Stat label="სულ ხარჯი" value={formatPrice(total)} color="text-slate-900" />
         <Stat label="გადარიცხული" value={formatPrice(paid)} color="text-emerald-700" />
         <Stat

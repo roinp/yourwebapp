@@ -9,6 +9,16 @@ body {
   color: #0f172a;
 }
 
+/* On phones, iOS Safari zooms the page in when a field with text under 16px is
+   focused, leaving the page enlarged and scrollable. 16px fields prevent that. */
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
 @utility input {
   @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-100 disabled:bg-slate-100;
 }

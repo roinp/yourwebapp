@@ -41,7 +41,7 @@ export default function DoctorsPage() {
       ) : doctors.length === 0 ? (
         <div className="card p-8 text-center text-slate-400">ექიმები ჯერ არ არის დამატებული</div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {pageItems.map((d) => (
             <div key={d.id} className="card p-5">
               <div className="flex items-start gap-3">

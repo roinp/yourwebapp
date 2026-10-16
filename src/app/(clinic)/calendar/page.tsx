@@ -115,7 +115,7 @@ export default function CalendarPage() {
         </button>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
         {/* Month view */}
         <section className="card p-4">
           <div className="mb-4 flex items-center justify-between gap-2">

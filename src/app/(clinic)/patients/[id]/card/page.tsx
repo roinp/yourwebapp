@@ -188,7 +188,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
 
       {/* ===== Card ===== */}
       <Section title="პაციენტის მონაცემები">
-        <div className="grid gap-4 rounded-lg bg-slate-50 p-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 rounded-lg bg-slate-50 p-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <Info label="გვარი, სახელი" value={`${patient.last_name} ${patient.first_name}`} />
           <Info label="დაბადების თარიღი" value={formatDate(patient.date_of_birth)} />
           <Info label="ტელეფონი" value={patient.phone ?? "—"} />
@@ -197,7 +197,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
             ეს მონაცემები პაციენტის ბარათიდან მოდის. შესაცვლელად გამოიყენეთ „რედაქტირება“ პაციენტის გვერდზე.
           </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="label">სქესი</label>
             <div className="flex gap-4 pt-1.5">
@@ -228,7 +228,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
 
       {/* ===== Annex 2 ===== */}
       <Section title="პაციენტის გასინჯვის ფურცელი" subtitle="დანართი №2 · ფორმა IV-220-1/ა">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="სტომატოლოგიური მომსახურების მიმწოდებელი" {...text("provider")} />
           <div>
             <label className="label">გასინჯვის თარიღი</label>
@@ -298,14 +298,14 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="თანკბილვა" {...text("occlusion")} />
           <Field label="პირის ღრუს ლორწოვანი გარსის მდგომარეობა" {...text("mucosa")} />
         </div>
 
         <div>
           <h3 className="mb-2 font-medium">პაროდონტის მდგომარეობა</h3>
-          <div className="grid gap-x-8 gap-y-1 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
             <CheckList items={PERIO_OPTIONS} selected={form.perio} onToggle={(i) => toggle("perio", i)} />
             <div>
               <p className="mb-1 text-sm font-medium text-slate-600">ნადები:</p>
@@ -348,7 +348,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
                 form.diary.map((r, j) => (j === i ? { ...r, ...patch } : r)),
               );
             return (
-              <div key={i} className="grid gap-2 rounded-lg border border-slate-200 p-2 sm:grid-cols-[150px_1fr_180px_auto]">
+              <div key={i} className="grid grid-cols-1 gap-2 rounded-lg border border-slate-200 p-2 sm:grid-cols-[150px_1fr_180px_auto]">
                 <input type="date" className="input" value={row.date} onChange={(e) => setRow({ date: e.target.value })} />
                 <textarea
                   rows={1}
@@ -397,7 +397,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
 
       {/* ===== Annex 3 ===== */}
       <Section title="ინფორმირებული თანხმობა" subtitle="დანართი №3 · ფორმა IV-220-2/ა">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Field
             label="პაციენტი (სახელი, გვარი)"
             placeholder={`${patient.first_name} ${patient.last_name}`}
@@ -518,7 +518,7 @@ function CheckList({
 
 function CheckColumns(props: { left: string[]; right: string[]; selected: string[]; onToggle: (item: string) => void }) {
   return (
-    <div className="grid gap-x-8 gap-y-1 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
       <CheckList items={props.left} selected={props.selected} onToggle={props.onToggle} />
       <CheckList items={props.right} selected={props.selected} onToggle={props.onToggle} />
     </div>

@@ -61,13 +61,13 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Stat label="დღევანდელი ვიზიტები" value={today.length} color="bg-teal-50 text-teal-700" />
         <Stat label="სულ პაციენტები" value={patientCount ?? "…"} color="bg-sky-50 text-sky-700" />
         <Stat label="მომავალი ვიზიტები" value={upcomingCount} color="bg-amber-50 text-amber-700" />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Section title="დღევანდელი ვიზიტები" scroll>
           {today.length === 0 ? (
             <Empty text="დღეს ვიზიტები არ არის" />

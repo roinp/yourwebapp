@@ -71,7 +71,7 @@ export default function ExpenseForm({
     <Modal title={expense ? "ხარჯის რედაქტირება" : "ახალი ხარჯი"} onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <DraftNotice restored={draft.restored} onReset={draft.reset} />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label className="label">დასახელება *</label>
             <input
