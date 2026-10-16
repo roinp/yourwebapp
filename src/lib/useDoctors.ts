@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "./supabase";
+import { db } from "./localDb";
 import type { Doctor } from "./types";
 
 export function useDoctors() {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   useEffect(() => {
-    supabase
+    db
       .from("doctors")
       .select("*")
       .order("name")

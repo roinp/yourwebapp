@@ -1,4 +1,4 @@
-# გივრაძე დენტ — სტომატოლოგიური კლინიკის მართვა
+# yourwebapp — სტომატოლოგიური კლინიკის მართვა
 
 Next.js 16 + Tailwind CSS 4 + Supabase (PostgreSQL + Auth).
 

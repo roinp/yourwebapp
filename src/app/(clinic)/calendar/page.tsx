@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { WEEKDAYS_SHORT, formatDate, formatTime, fullName, monthName, toISODate, todayISO } from "@/lib/format";
 import type { Appointment, BlockedSlot } from "@/lib/types";
 import AppointmentForm from "@/components/AppointmentForm";
@@ -36,14 +36,14 @@ export default function CalendarPage() {
     const rangeStart = toISODate(grid[0]);
     const rangeEnd = toISODate(grid[grid.length - 1]);
     const [{ data }, { data: blocked }] = await Promise.all([
-      supabase
+      db
         .from("appointments")
         .select("*, patients(id, first_name, last_name, phone), doctors(id, name)")
         .gte("date", rangeStart)
         .lte("date", rangeEnd)
         .order("date")
         .order("time"),
-      supabase.from("blocked_slots").select("*").gte("date", rangeStart).lte("date", rangeEnd),
+      db.from("blocked_slots").select("*").gte("date", rangeStart).lte("date", rangeEnd),
     ]);
     setAppointments(data ?? []);
     setBlockedSlots(blocked ?? []);
@@ -69,14 +69,14 @@ export default function CalendarPage() {
 
   async function toggleBlock(time: string) {
     const { error } = dayBlocked.has(time)
-      ? await supabase.from("blocked_slots").delete().eq("date", selectedDate).eq("time", time)
-      : await supabase.from("blocked_slots").insert({ date: selectedDate, time });
+      ? await db.from("blocked_slots").delete().eq("date", selectedDate).eq("time", time)
+      : await db.from("blocked_slots").insert({ date: selectedDate, time });
     setBlockError(error?.message ?? null);
     load();
   }
 
   async function blockDay(times: string[]) {
-    const { error } = await supabase
+    const { error } = await db
       .from("blocked_slots")
       .upsert(
         times.map((time) => ({ date: selectedDate, time })),
@@ -87,7 +87,7 @@ export default function CalendarPage() {
   }
 
   async function unblockDay() {
-    const { error } = await supabase.from("blocked_slots").delete().eq("date", selectedDate);
+    const { error } = await db.from("blocked_slots").delete().eq("date", selectedDate);
     setBlockError(error?.message ?? null);
     load();
   }

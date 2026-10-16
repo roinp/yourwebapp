@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { todayISO } from "@/lib/format";
 import { useDoctors } from "@/lib/useDoctors";
 import { useDraft } from "@/lib/useDraft";
@@ -57,8 +57,8 @@ export default function TreatmentForm({
       paid: Number(form.paid) || 0,
     };
     const { error } = treatment
-      ? await supabase.from("treatments").update(payload).eq("id", treatment.id)
-      : await supabase.from("treatments").insert(payload);
+      ? await db.from("treatments").update(payload).eq("id", treatment.id)
+      : await db.from("treatments").insert(payload);
     setBusy(false);
     if (error) return setError(error.message);
     draft.clear();

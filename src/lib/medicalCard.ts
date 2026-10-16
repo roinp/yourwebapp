@@ -1,9 +1,9 @@
 // Dental medical card — Georgian form IV-220 (stomat.docx): card + Annex 2 (exam sheet) + Annex 3 (consent).
 
-export const CLINIC_NAME = "გივრაძე დენტ";
+export const CLINIC_NAME = "yourwebapp";
 
 /** Brand name shown in the app header and on printouts. */
-export const CLINIC_BRAND = "LIGHT DENT";
+export const CLINIC_BRAND = "YOURWEBAPP";
 
 export type DiaryRow = { date: string; text: string; doctor: string };
 

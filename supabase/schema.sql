@@ -1,4 +1,4 @@
--- გივრაძე დენტ — Supabase-ის სქემა
+-- yourwebapp — Supabase-ის სქემა
 -- გაუშვით Supabase Dashboard → SQL Editor-ში.
 
 -- ===== users (თანამშრომლები; აკავშირებს Supabase Auth-ს) =====

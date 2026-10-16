@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDateShort, formatPrice } from "@/lib/format";
 import type { Expense } from "@/lib/types";
 import ExpenseForm, { EXPENSE_CATEGORIES } from "@/components/ExpenseForm";
@@ -35,7 +35,7 @@ function Expenses() {
   const [deleting, setDeleting] = useState<Expense | null>(null);
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("expenses")
       .select("*")
       .order("date", { ascending: false })
@@ -130,7 +130,7 @@ function Expenses() {
           <p className="p-8 text-center text-slate-400">იტვირთება...</p>
         ) : loadError ? (
           <p className="p-8 text-center text-sm text-red-600">
-            ხარჯების ცხრილი ვერ ჩაიტვირთა. გაუშვით <code>supabase/add_expenses.sql</code> Supabase-ის SQL Editor-ში.
+            ხარჯების ცხრილი ვერ ჩაიტვირთა.
           </p>
         ) : filtered.length === 0 ? (
           <p className="p-8 text-center text-slate-400">
@@ -245,7 +245,7 @@ function Expenses() {
           message={`წაიშალოს ხარჯი „${deleting.item}“?`}
           onClose={() => setDeleting(null)}
           onConfirm={async () => {
-            await supabase.from("expenses").delete().eq("id", deleting.id);
+            await db.from("expenses").delete().eq("id", deleting.id);
             setDeleting(null);
             load();
           }}

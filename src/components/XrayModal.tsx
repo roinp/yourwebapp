@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDate } from "@/lib/format";
 import type { Treatment } from "@/lib/types";
 import Modal from "./Modal";
@@ -38,7 +38,7 @@ export default function XrayModal({
   useEffect(() => {
     const missing = paths.filter((p) => !urls[p]);
     if (!missing.length) return;
-    supabase.storage
+    db.storage
       .from(BUCKET)
       .createSignedUrls(missing, 60 * 60)
       .then(({ data, error }) => {
@@ -52,7 +52,7 @@ export default function XrayModal({
   }, [paths, urls]);
 
   async function savePaths(next: string[]) {
-    const { error } = await supabase
+    const { error } = await db
       .from("treatments")
       .update({ xray_paths: next, xray_path: null })
       .eq("id", treatment.id);
@@ -76,14 +76,14 @@ export default function XrayModal({
       setBusy(`იტვირთება ${i + 1}/${ok.length}...`);
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${treatment.patient_id}/${treatment.id}-${Date.now()}-${i}.${ext}`;
-      const { error } = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type });
+      const { error } = await db.storage.from(BUCKET).upload(path, file, { contentType: file.type });
       if (error) problems.push(`${file.name}: ${error.message}`);
       else uploaded.push(path);
     }
     try {
       if (uploaded.length) await savePaths([...paths, ...uploaded]);
     } catch (e) {
-      await supabase.storage.from(BUCKET).remove(uploaded);
+      await db.storage.from(BUCKET).remove(uploaded);
       problems.push((e as Error).message);
     }
     setBusy(null);
@@ -96,7 +96,7 @@ export default function XrayModal({
     setBusy("იშლება...");
     try {
       await savePaths(paths.filter((p) => p !== path));
-      await supabase.storage.from(BUCKET).remove([path]);
+      await db.storage.from(BUCKET).remove([path]);
       setViewing(paths.length > 1 ? Math.min(viewing, paths.length - 2) : null);
     } catch (e) {
       setError((e as Error).message);

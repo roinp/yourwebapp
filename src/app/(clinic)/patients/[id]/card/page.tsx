@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDate, todayISO } from "@/lib/format";
 import { useDoctors } from "@/lib/useDoctors";
 import { useDraft } from "@/lib/useDraft";
@@ -37,8 +37,8 @@ export default function MedicalCardPage() {
 
   useEffect(() => {
     Promise.all([
-      supabase.from("patients").select("*").eq("id", id).maybeSingle(),
-      supabase.from("medical_cards").select("card_number, data").eq("patient_id", id).maybeSingle(),
+      db.from("patients").select("*").eq("id", id).maybeSingle(),
+      db.from("medical_cards").select("card_number, data").eq("patient_id", id).maybeSingle(),
     ]).then(([p, c]) => {
       if (c.error) return setLoadError(c.error.message);
       if (!p.data) return setLoadError("პაციენტი ვერ მოიძებნა");
@@ -50,9 +50,6 @@ export default function MedicalCardPage() {
     return (
       <div className="card space-y-2 p-8 text-center">
         <p className="text-red-600">სამედიცინო ბარათი ვერ ჩაიტვირთა.</p>
-        <p className="text-sm text-slate-500">
-          თუ ცხრილი ჯერ არ შეგიქმნიათ, გაუშვით <code>supabase/add_medical_cards.sql</code> Supabase-ის SQL Editor-ში.
-        </p>
         <p className="text-xs text-slate-400">{loadError}</p>
       </div>
     );
@@ -92,7 +89,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
   async function save(): Promise<boolean> {
     setBusy(true);
     setError(null);
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("medical_cards")
       .upsert(
         { patient_id: patientId, data: form, updated_at: new Date().toISOString() },
@@ -107,7 +104,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
     }
     // History copy: today's entry of this examination is updated, otherwise a new entry is added.
     const today = todayISO();
-    const { data: todays } = await supabase
+    const { data: todays } = await db
       .from("medical_card_versions")
       .select("id, data")
       .eq("patient_id", patientId)
@@ -117,8 +114,8 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
     );
     const copy = { card_number: data.card_number, data: form, saved_at: new Date().toISOString() };
     const { error: historyError } = sameExam
-      ? await supabase.from("medical_card_versions").update(copy).eq("id", sameExam.id)
-      : await supabase
+      ? await db.from("medical_card_versions").update(copy).eq("id", sameExam.id)
+      : await db
           .from("medical_card_versions")
           .insert({ ...copy, patient_id: patientId, version_date: today });
     setBusy(false);
@@ -142,7 +139,7 @@ function CardForm({ patientId, patient, card, cardNumber: initialNumber }: Loade
   }
 
   async function importTreatments() {
-    const { data } = await supabase
+    const { data } = await db
       .from("treatments")
       .select("*, doctors(id, name)")
       .eq("patient_id", patientId)

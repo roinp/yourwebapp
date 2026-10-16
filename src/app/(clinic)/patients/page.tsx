@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDate, formatTime, todayISO } from "@/lib/format";
 import type { Patient } from "@/lib/types";
 import PatientForm from "@/components/PatientForm";
@@ -28,7 +28,7 @@ export default function PatientsPage() {
 
   const load = useCallback(async () => {
     // Each patient with only their most recent past appointment (last visit).
-    const { data } = await supabase
+    const { data } = await db
       .from("patients")
       .select("*, appointments(date, time)")
       .lte("appointments.date", todayISO())
@@ -85,7 +85,7 @@ export default function PatientsPage() {
     const ids = [...selected];
     // Chunked so the request URL stays short with many patients.
     for (let i = 0; i < ids.length; i += 100) {
-      await supabase.from("patients").delete().in("id", ids.slice(i, i + 100));
+      await db.from("patients").delete().in("id", ids.slice(i, i + 100));
     }
     setSelected(new Set());
     setBulkDeleting(false);
@@ -251,7 +251,7 @@ export default function PatientsPage() {
           message={`წაიშალოს პაციენტი „${deleting.first_name} ${deleting.last_name}"? წაიშლება მისი ვიზიტები და მკურნალობის ისტორიაც.`}
           onClose={() => setDeleting(null)}
           onConfirm={async () => {
-            await supabase.from("patients").delete().eq("id", deleting.id);
+            await db.from("patients").delete().eq("id", deleting.id);
             if (selected.has(deleting.id)) toggleOne(deleting.id);
             setDeleting(null);
             load();

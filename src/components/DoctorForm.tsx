@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { useDraft } from "@/lib/useDraft";
 import type { Doctor } from "@/lib/types";
 import Modal from "./Modal";
@@ -39,8 +39,8 @@ export default function DoctorForm({
       specialty: form.specialty.trim() || null,
     };
     const { error } = doctor
-      ? await supabase.from("doctors").update(payload).eq("id", doctor.id)
-      : await supabase.from("doctors").insert(payload);
+      ? await db.from("doctors").update(payload).eq("id", doctor.id)
+      : await db.from("doctors").insert(payload);
     setBusy(false);
     if (error) return setError(error.message);
     draft.clear();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { fullName, todayISO } from "@/lib/format";
 import { useDoctors } from "@/lib/useDoctors";
 import { useDraft } from "@/lib/useDraft";
@@ -50,7 +50,7 @@ export default function AppointmentForm({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase
+    db
       .from("patients")
       .select("id, first_name, last_name, phone, personal_id")
       .order("last_name")
@@ -65,12 +65,12 @@ export default function AppointmentForm({
   const [dayBlocked, setDayBlocked] = useState<string[]>([]);
   useEffect(() => {
     if (!form.date) return;
-    supabase
+    db
       .from("appointments")
       .select("id, time, doctor_id, patients(first_name, last_name)")
       .eq("date", form.date)
       .then(({ data }) => setDayAppointments((data as unknown as Appointment[]) ?? []));
-    supabase
+    db
       .from("blocked_slots")
       .select("time")
       .eq("date", form.date)
@@ -168,54 +168,55 @@ export default function AppointmentForm({
     // A moved visit needs a fresh day-before reminder.
     const moved =
       appointment && (appointment.date !== form.date || appointment.time.slice(0, 5) !== form.time);
-    const { data: saved, error } = appointment
-      ? await supabase
+    const { error } = appointment
+      ? await db
           .from("appointments")
           .update(moved ? { ...payload, sms_reminder_sent_at: null } : payload)
           .eq("id", appointment.id)
           .select("id")
           .single()
-      : await supabase.from("appointments").insert(payload).select("id").single();
+      : await db.from("appointments").insert(payload).select("id").single();
     if (error) {
       setBusy(false);
       return setError(error.message);
     }
-    if (!appointment || moved) {
-      // The server waits 10 seconds before sending, so don't keep the form open for it.
-      sendBookingSms(saved.id).then((smsError) => {
-        if (smsError) window.alert(`ვიზიტი შენახულია, მაგრამ SMS ვერ გაიგზავნა:\n${smsError}`);
-      });
-    }
+    // SMS is turned off in the demo version.
+    // if (!appointment || moved) {
+    //   // The server waits 10 seconds before sending, so don't keep the form open for it.
+    //   sendBookingSms(saved.id).then((smsError) => {
+    //     if (smsError) window.alert(`ვიზიტი შენახულია, მაგრამ SMS ვერ გაიგზავნა:\n${smsError}`);
+    //   });
+    // }
     setBusy(false);
     draft.clear();
     onSaved();
   }
 
-  /** Returns an error message, or null when the SMS was sent. */
-  async function sendBookingSms(appointmentId: string) {
-    const { data } = await supabase.auth.getSession();
-    try {
-      const res = await fetch("/api/sms/confirm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${data.session?.access_token ?? ""}`,
-        },
-        body: JSON.stringify({ appointmentId }),
-      });
-      const body = await res.json().catch(() => null);
-      if (body?.sms) {
-        console.log("[SMS] request body:", body.sms.request);
-        console.log(`[SMS] response ${body.sms.status}:`, body.sms.response);
-      } else {
-        console.log(`[SMS] ${res.status}:`, body);
-      }
-      if (res.ok) return null;
-      return body?.error ?? `შეცდომა ${res.status}`;
-    } catch {
-      return "სერვერთან კავშირი ვერ დამყარდა";
-    }
-  }
+  // /** Returns an error message, or null when the SMS was sent. */
+  // async function sendBookingSms(appointmentId: string) {
+  //   const { data } = await supabase.auth.getSession();
+  //   try {
+  //     const res = await fetch("/api/sms/confirm", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${data.session?.access_token ?? ""}`,
+  //       },
+  //       body: JSON.stringify({ appointmentId }),
+  //     });
+  //     const body = await res.json().catch(() => null);
+  //     if (body?.sms) {
+  //       console.log("[SMS] request body:", body.sms.request);
+  //       console.log(`[SMS] response ${body.sms.status}:`, body.sms.response);
+  //     } else {
+  //       console.log(`[SMS] ${res.status}:`, body);
+  //     }
+  //     if (res.ok) return null;
+  //     return body?.error ?? `შეცდომა ${res.status}`;
+  //   } catch {
+  //     return "სერვერთან კავშირი ვერ დამყარდა";
+  //   }
+  // }
 
   return (
     <Modal title={appointment ? "ვიზიტის რედაქტირება" : "ვიზიტის დაჯავშნა"} onClose={onClose}>

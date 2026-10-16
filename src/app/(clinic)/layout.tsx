@@ -2,35 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Session } from "@supabase/supabase-js";
-import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { isLoggedIn, logOut } from "@/lib/demoAuth";
 import Sidebar from "@/components/Sidebar";
-import SetupNotice from "@/components/SetupNotice";
 import CalculatorModal from "@/components/CalculatorModal";
 
+// Demo version: the login page only asks to press "შესვლა"; data stays in this browser.
 export default function ClinicLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [session, setSession] = useState<Session | null>(null);
-  const [checking, setChecking] = useState(isSupabaseConfigured);
+  const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) router.replace("/login");
-      setSession(data.session);
-      setChecking(false);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-      setSession(s);
-      if (!s) router.replace("/login");
-    });
-    return () => sub.subscription.unsubscribe();
+    if (!isLoggedIn()) router.replace("/login");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount
+    else setReady(true);
   }, [router]);
 
-  if (!isSupabaseConfigured) return <SetupNotice />;
-  if (checking || !session) {
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center text-slate-500">
         იტვირთება...
@@ -41,10 +30,12 @@ export default function ClinicLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen">
       <Sidebar
-        email={session.user.email ?? ""}
         open={menuOpen}
         onNavigate={() => setMenuOpen(false)}
-        onLogout={() => supabase.auth.signOut()}
+        onLogout={() => {
+          logOut();
+          router.replace("/login");
+        }}
         onCalculator={() => setCalcOpen(true)}
       />
       {menuOpen && (
@@ -63,7 +54,7 @@ export default function ClinicLayout({ children }: { children: React.ReactNode }
           >
             ☰
           </button>
-          <span className="font-semibold">🦷 LIGHT DENT</span>
+          <span className="font-semibold">🦷 YOURWEBAPP</span>
         </header>
         <main className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">{children}</main>
         {calcOpen && <CalculatorModal onClose={() => setCalcOpen(false)} />}

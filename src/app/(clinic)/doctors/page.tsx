@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import type { Doctor } from "@/lib/types";
 import DoctorForm from "@/components/DoctorForm";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -15,7 +15,7 @@ export default function DoctorsPage() {
   const [deleting, setDeleting] = useState<Doctor | null>(null);
 
   const load = useCallback(async () => {
-    const { data } = await supabase.from("doctors").select("*").order("name");
+    const { data } = await db.from("doctors").select("*").order("name");
     setDoctors(data ?? []);
     setLoading(false);
   }, []);
@@ -84,7 +84,7 @@ export default function DoctorsPage() {
           message={`წაიშალოს ექიმი „${deleting.name}"? მისი ვიზიტები და ჩანაწერები დარჩება, ექიმის გარეშე.`}
           onClose={() => setDeleting(null)}
           onConfirm={async () => {
-            await supabase.from("doctors").delete().eq("id", deleting.id);
+            await db.from("doctors").delete().eq("id", deleting.id);
             setDeleting(null);
             load();
           }}

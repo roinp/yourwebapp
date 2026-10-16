@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { useDraft } from "@/lib/useDraft";
 import type { Patient } from "@/lib/types";
 import Modal from "./Modal";
@@ -53,8 +53,8 @@ export default function PatientForm({
       notes: form.notes.trim() || null,
     };
     const query = patient
-      ? supabase.from("patients").update(payload).eq("id", patient.id)
-      : supabase.from("patients").insert(payload);
+      ? db.from("patients").update(payload).eq("id", patient.id)
+      : db.from("patients").insert(payload);
     const { data, error } = await query.select().single();
     setBusy(false);
     if (error) {

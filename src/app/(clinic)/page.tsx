@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDate, formatTime, fullName, todayISO } from "@/lib/format";
 import type { Appointment } from "@/lib/types";
 import AppointmentForm from "@/components/AppointmentForm";
@@ -23,15 +23,15 @@ export default function DashboardPage() {
   const load = useCallback(async () => {
     const t = todayISO();
     const [todayRes, upcomingRes, countRes] = await Promise.all([
-      supabase.from("appointments").select(APPT_SELECT).eq("date", t).order("time"),
-      supabase
+      db.from("appointments").select(APPT_SELECT).eq("date", t).order("time"),
+      db
         .from("appointments")
         .select(APPT_SELECT, { count: "exact" })
         .gt("date", t)
         .order("date")
         .order("time")
         .limit(100),
-      supabase.from("patients").select("id", { count: "exact", head: true }),
+      db.from("patients").select("id", { count: "exact", head: true }),
     ]);
     setToday(todayRes.data ?? []);
     setUpcoming(upcomingRes.data ?? []);

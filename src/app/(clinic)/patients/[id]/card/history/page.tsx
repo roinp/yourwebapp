@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDate, formatDateShort } from "@/lib/format";
 import { normalizeCard, type MedicalCardData } from "@/lib/medicalCard";
 import type { Patient } from "@/lib/types";
@@ -38,7 +38,7 @@ export default function CardHistoryPage() {
 
   async function deleteSelected() {
     const ids = [...selected];
-    const { error } = await supabase.from("medical_card_versions").delete().in("id", ids);
+    const { error } = await db.from("medical_card_versions").delete().in("id", ids);
     setConfirmDelete(false);
     if (error) return setDeleteError(error.message);
     setDeleteError(null);
@@ -48,8 +48,8 @@ export default function CardHistoryPage() {
 
   useEffect(() => {
     Promise.all([
-      supabase.from("patients").select("*").eq("id", id).maybeSingle(),
-      supabase
+      db.from("patients").select("*").eq("id", id).maybeSingle(),
+      db
         .from("medical_card_versions")
         .select("id, card_number, version_date, saved_at, data")
         .eq("patient_id", id)
@@ -66,9 +66,6 @@ export default function CardHistoryPage() {
     return (
       <div className="card space-y-2 p-8 text-center">
         <p className="text-red-600">ბარათის ისტორია ვერ ჩაიტვირთა.</p>
-        <p className="text-sm text-slate-500">
-          თუ ცხრილი ჯერ არ შეგიქმნიათ, გაუშვით <code>supabase/add_card_history.sql</code> Supabase-ის SQL Editor-ში.
-        </p>
         <p className="text-xs text-slate-400">{error}</p>
       </div>
     );

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { age, formatDate, formatDateShort, formatPrice, formatTime, todayISO } from "@/lib/format";
 import type { Appointment, Patient, Treatment } from "@/lib/types";
 import PatientForm from "@/components/PatientForm";
@@ -33,14 +33,14 @@ export default function PatientProfilePage() {
 
   const load = useCallback(async () => {
     const [p, t, a] = await Promise.all([
-      supabase.from("patients").select("*").eq("id", id).maybeSingle(),
-      supabase
+      db.from("patients").select("*").eq("id", id).maybeSingle(),
+      db
         .from("treatments")
         .select("*, doctors(id, name)")
         .eq("patient_id", id)
         .order("date", { ascending: false })
         .order("created_at", { ascending: false }),
-      supabase
+      db
         .from("appointments")
         .select("*, patients(id, first_name, last_name, phone), doctors(id, name)")
         .eq("patient_id", id)
@@ -295,7 +295,7 @@ export default function PatientProfilePage() {
           message="ნამდვილად გსურთ პაციენტის წაშლა? წაიშლება მისი ვიზიტები და მკურნალობის ისტორიაც."
           onClose={() => setDeletingPatient(false)}
           onConfirm={async () => {
-            await supabase.from("patients").delete().eq("id", patient.id);
+            await db.from("patients").delete().eq("id", patient.id);
             router.replace("/patients");
           }}
         />
@@ -316,9 +316,9 @@ export default function PatientProfilePage() {
           message={`წაიშალოს ჩანაწერი „${deletingTreatment.procedure}"?`}
           onClose={() => setDeletingTreatment(null)}
           onConfirm={async () => {
-            await supabase.from("treatments").delete().eq("id", deletingTreatment.id);
+            await db.from("treatments").delete().eq("id", deletingTreatment.id);
             const xrays = xrayPathsOf(deletingTreatment);
-            if (xrays.length) await supabase.storage.from("xrays").remove(xrays);
+            if (xrays.length) await db.storage.from("xrays").remove(xrays);
             setDeletingTreatment(null);
             load();
           }}

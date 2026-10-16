@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useParams } from "next/navigation";
+import { db } from "@/lib/localDb";
 import { normalizeCard, type MedicalCardData } from "@/lib/medicalCard";
 import { formatDateShort } from "@/lib/format";
 import type { Patient } from "@/lib/types";
@@ -21,27 +21,24 @@ type Loaded = { patient: Patient; card: MedicalCardData; cardNumber: number; ver
 /** Standalone A4 view of a patient's medical card (no sidebar) with print and Word export. */
 export default function PrintCardPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
   const docRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) return router.replace("/login");
       // ?version=<id> shows a dated copy from the card history instead of the current card.
       const versionId = new URLSearchParams(window.location.search).get("version");
       const [p, c] = await Promise.all([
-        supabase.from("patients").select("*").eq("id", id).maybeSingle(),
+        db.from("patients").select("*").eq("id", id).maybeSingle(),
         versionId
-          ? supabase
+          ? db
               .from("medical_card_versions")
               .select("card_number, data, version_date")
               .eq("id", versionId)
               .eq("patient_id", id)
               .maybeSingle()
-          : supabase.from("medical_cards").select("card_number, data").eq("patient_id", id).maybeSingle(),
+          : db.from("medical_cards").select("card_number, data").eq("patient_id", id).maybeSingle(),
       ]);
       if (!p.data || !c.data) return setError("სამედიცინო ბარათი ვერ მოიძებნა. ჯერ შეავსეთ და შეინახეთ.");
       setLoaded({
@@ -51,7 +48,7 @@ export default function PrintCardPage() {
         versionDate: "version_date" in c.data ? (c.data.version_date as string) : null,
       });
     })();
-  }, [id, router]);
+  }, [id]);
 
   function downloadWord() {
     if (!loaded || !docRef.current) return;

@@ -8,7 +8,7 @@ const georgian = Noto_Sans_Georgian({
 });
 
 export const metadata: Metadata = {
-  title: "LIGHT DENT — კლინიკის მართვა",
+  title: "YOURWEBAPP — კლინიკის მართვა",
   description: "სტომატოლოგიური კლინიკის მართვის სისტემა",
 };
 

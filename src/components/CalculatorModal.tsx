@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDateShort, formatPrice } from "@/lib/format";
 import { useDraft } from "@/lib/useDraft";
 import { buildQuoteHtml, computeQuote, emptyRow, rowTotal, type Quote, type Row } from "@/lib/quote";
@@ -32,12 +32,12 @@ export default function CalculatorModal({ onClose }: { onClose: () => void }) {
 
   // Names of treatments done before and of patients, offered as suggestions.
   useEffect(() => {
-    supabase
+    db
       .from("treatments")
       .select("procedure")
       .limit(1000)
       .then(({ data }) => setSuggestions([...new Set((data ?? []).map((t) => t.procedure.trim()))].sort()));
-    supabase
+    db
       .from("patients")
       .select("first_name, last_name")
       .order("last_name")
@@ -65,8 +65,8 @@ export default function CalculatorModal({ onClose }: { onClose: () => void }) {
       updated_at: new Date().toISOString(),
     };
     const res = value.savedId
-      ? await supabase.from("calculations").update(payload).eq("id", value.savedId).select("id").single()
-      : await supabase.from("calculations").insert(payload).select("id").single();
+      ? await db.from("calculations").update(payload).eq("id", value.savedId).select("id").single()
+      : await db.from("calculations").insert(payload).select("id").single();
     setBusy(false);
     if (res.error) return setError(res.error.message);
     const next = { ...value, savedId: res.data.id };
@@ -249,13 +249,7 @@ export default function CalculatorModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <ErrorText
-          error={
-            error && /calculations/.test(error)
-              ? `${error} — გაუშვით supabase/add_calculations.sql Supabase-ში.`
-              : error
-          }
-        />
+        <ErrorText error={error} />
 
         <div className="flex flex-wrap justify-end gap-2">
           <button type="button" className="btn-secondary mr-auto" onClick={onClose}>
@@ -303,19 +297,19 @@ function SavedList({
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase
+    db
       .from("calculations")
       .select("id, patient_name, discount, rows, total, updated_at")
       .order("updated_at", { ascending: false })
       .limit(300)
       .then(({ data, error }) => {
-        if (error) return setError(`${error.message} — გაუშვით supabase/add_calculations.sql Supabase-ში.`);
+        if (error) return setError(error.message);
         setItems(data ?? []);
       });
   }, []);
 
   async function remove(id: string) {
-    const { error } = await supabase.from("calculations").delete().eq("id", id);
+    const { error } = await db.from("calculations").delete().eq("id", id);
     setConfirmId(null);
     if (error) return setError(error.message);
     setItems((list) => (list ?? []).filter((c) => c.id !== id));

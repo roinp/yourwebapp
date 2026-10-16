@@ -12,13 +12,11 @@ const NAV = [
 ];
 
 export default function Sidebar({
-  email,
   open,
   onNavigate,
   onLogout,
   onCalculator,
 }: {
-  email: string;
   open: boolean;
   onNavigate: () => void;
   onLogout: () => void;
@@ -39,7 +37,7 @@ export default function Sidebar({
           🦷
         </div>
         <div>
-          <p className="font-semibold text-white">LIGHT DENT</p>
+          <p className="font-semibold text-white">YOURWEBAPP</p>
           <p className="text-xs text-slate-400">კლინიკის მართვა</p>
         </div>
       </div>
@@ -74,7 +72,7 @@ export default function Sidebar({
       </nav>
 
       <div className="border-t border-slate-800 p-4">
-        <p className="truncate text-xs text-slate-400">{email}</p>
+        <p className="text-xs text-slate-400">დემო ვერსია · მონაცემები ინახება ამ ბრაუზერში</p>
         <button
           onClick={onLogout}
           className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800 hover:text-white"

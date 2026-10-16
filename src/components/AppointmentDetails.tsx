@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { formatDate, formatTime, fullName } from "@/lib/format";
 import type { Appointment } from "@/lib/types";
 import Modal from "./Modal";
@@ -40,7 +40,7 @@ export default function AppointmentDetails({
         message="ნამდვილად გსურთ ამ ვიზიტის წაშლა?"
         onClose={() => setMode("view")}
         onConfirm={async () => {
-          await supabase.from("appointments").delete().eq("id", appointment.id);
+          await db.from("appointments").delete().eq("id", appointment.id);
           onChanged();
           onClose();
         }}

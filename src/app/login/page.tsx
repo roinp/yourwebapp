@@ -1,35 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { isSupabaseConfigured, supabase } from "@/lib/supabase";
-import SetupNotice from "@/components/SetupNotice";
-import ErrorText from "@/components/ErrorText";
+import { logIn } from "@/lib/demoAuth";
 
+// Demo login: any email/password (or none) opens the dashboard.
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [email, setEmail] = useState("demo@yourwebapp.ge");
+  const [password, setPassword] = useState("demo1234");
 
-  useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) router.replace("/");
-    });
-  }, [router]);
-
-  if (!isSupabaseConfigured) return <SetupNotice />;
-
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
-    setError(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
-    if (error) setError("ელ-ფოსტა ან პაროლი არასწორია");
-    else router.replace("/");
+    logIn();
+    router.replace("/");
   }
 
   return (
@@ -39,14 +23,13 @@ export default function LoginPage() {
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600 text-3xl">
             🦷
           </div>
-          <h1 className="mt-4 text-xl font-semibold">LIGHT DENT</h1>
+          <h1 className="mt-4 text-xl font-semibold">YOURWEBAPP</h1>
           <p className="text-sm text-slate-500">თანამშრომლების შესვლა</p>
         </div>
         <div>
           <label className="label">ელ-ფოსტა</label>
           <input
             type="email"
-            required
             className="input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -56,16 +39,13 @@ export default function LoginPage() {
           <label className="label">პაროლი</label>
           <input
             type="password"
-            required
             className="input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <ErrorText error={error} />
-        <button className="btn-primary w-full" disabled={busy}>
-          {busy ? "შესვლა..." : "შესვლა"}
-        </button>
+        <button className="btn-primary w-full">შესვლა</button>
+        <p className="text-center text-xs text-slate-400">დემო ვერსია — შესასვლელად უბრალოდ დააჭირეთ „შესვლა“-ს</p>
       </form>
     </div>
   );

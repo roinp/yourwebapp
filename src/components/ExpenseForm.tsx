@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { db } from "@/lib/localDb";
 import { todayISO } from "@/lib/format";
 import { useDraft } from "@/lib/useDraft";
 import type { Expense } from "@/lib/types";
@@ -59,8 +59,8 @@ export default function ExpenseForm({
       notes: form.notes.trim() || null,
     };
     const { error } = expense
-      ? await supabase.from("expenses").update(payload).eq("id", expense.id)
-      : await supabase.from("expenses").insert(payload);
+      ? await db.from("expenses").update(payload).eq("id", expense.id)
+      : await db.from("expenses").insert(payload);
     setBusy(false);
     if (error) return setError(error.message);
     draft.clear();
