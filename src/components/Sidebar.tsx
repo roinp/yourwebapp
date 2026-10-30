@@ -19,7 +19,7 @@ export default function Sidebar({
 }: {
   open: boolean;
   onNavigate: () => void;
-  onLogout?: () => void;
+  onLogout: () => void;
   onCalculator: () => void;
 }) {
   const pathname = usePathname();
@@ -73,14 +73,12 @@ export default function Sidebar({
 
       <div className="border-t border-slate-800 p-4">
         <p className="text-xs text-slate-400">დემო ვერსია · მონაცემები ინახება ამ ბრაუზერში</p>
-        {onLogout && (
-          <button
-            onClick={onLogout}
-            className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
-          >
-            ⎋ გასვლა
-          </button>
-        )}
+        <button
+          onClick={onLogout}
+          className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+        >
+          ⎋ გასვლა
+        </button>
       </div>
     </aside>
   );

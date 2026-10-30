@@ -1,43 +1,41 @@
 "use client";
 
-import { useState } from "react";
-// Login is turned off for now — the app opens straight to the dashboard.
-// import { useEffect } from "react";
-// import { useRouter } from "next/navigation";
-// import { isLoggedIn, logOut } from "@/lib/demoAuth";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { isLoggedIn, logOut } from "@/lib/demoAuth";
 import Sidebar from "@/components/Sidebar";
 import CalculatorModal from "@/components/CalculatorModal";
 
-// Demo version: data stays in this browser.
+// Demo version: the login page only asks to press "შესვლა"; data stays in this browser.
 export default function ClinicLayout({ children }: { children: React.ReactNode }) {
-  // const router = useRouter();
-  // const [ready, setReady] = useState(false);
+  const router = useRouter();
+  const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
 
-  // useEffect(() => {
-  //   if (!isLoggedIn()) router.replace("/login");
-  //   // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount
-  //   else setReady(true);
-  // }, [router]);
-  //
-  // if (!ready) {
-  //   return (
-  //     <div className="flex min-h-screen items-center justify-center text-slate-500">
-  //       იტვირთება...
-  //     </div>
-  //   );
-  // }
+  useEffect(() => {
+    if (!isLoggedIn()) router.replace("/login");
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage is only readable after mount
+    else setReady(true);
+  }, [router]);
+
+  if (!ready) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-slate-500">
+        იტვირთება...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
       <Sidebar
         open={menuOpen}
         onNavigate={() => setMenuOpen(false)}
-        // onLogout={() => {
-        //   logOut();
-        //   router.replace("/login");
-        // }}
+        onLogout={() => {
+          logOut();
+          router.replace("/login");
+        }}
         onCalculator={() => setCalcOpen(true)}
       />
       {menuOpen && (
